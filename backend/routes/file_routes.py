@@ -16,8 +16,9 @@ file_bp = Blueprint("files", __name__)
 supabase = get_supabase()
 BUCKET = get_bucket_name()
 
+
 # ---------- Upload ----------
-@file_bp.post("/upload")
+@file_bp.route("/upload", methods=["POST", "OPTIONS"])
 @jwt_required()
 def upload_file():
     user_id = get_jwt_identity()
@@ -51,8 +52,8 @@ def upload_file():
     return jsonify({"message": "File uploaded successfully"}), 201
 
 
-# ---------- List ----------
-@file_bp.get("/")
+# ---------- List Files ----------
+@file_bp.route("/", methods=["GET", "OPTIONS"])
 @jwt_required()
 def list_files():
     """List all files for a user (filter trashed if query param is set)."""
@@ -71,7 +72,7 @@ def list_files():
 
 
 # ---------- Signed URL ----------
-@file_bp.get("/file/<file_id>/signed-url")
+@file_bp.route("/file/<file_id>/signed-url", methods=["GET", "OPTIONS"])
 @jwt_required()
 def file_signed_url(file_id):
     user_id = get_jwt_identity()
@@ -104,7 +105,7 @@ def file_signed_url(file_id):
 
 
 # ---------- Rename ----------
-@file_bp.post("/file/<file_id>/rename")
+@file_bp.route("/file/<file_id>/rename", methods=["POST", "OPTIONS"])
 @jwt_required()
 def rename_file(file_id):
     user_id = get_jwt_identity()
@@ -121,8 +122,8 @@ def rename_file(file_id):
     return jsonify({"message": "Renamed"}), 200
 
 
-# ---------- Trash / Restore / Purge ----------
-@file_bp.get("/trash")
+# ---------- Trash ----------
+@file_bp.route("/trash", methods=["GET", "OPTIONS"])
 @jwt_required()
 def list_trash():
     user_id = get_jwt_identity()
@@ -137,7 +138,7 @@ def list_trash():
     return jsonify({"files": resp.data or []}), 200
 
 
-@file_bp.post("/trash/<file_id>")
+@file_bp.route("/trash/<file_id>", methods=["POST", "OPTIONS"])
 @jwt_required()
 def move_to_trash(file_id):
     user_id = get_jwt_identity()
@@ -152,7 +153,7 @@ def move_to_trash(file_id):
     return jsonify({"message": "Moved to Trash"}), 200
 
 
-@file_bp.post("/trash/<file_id>/restore")
+@file_bp.route("/trash/<file_id>/restore", methods=["POST", "OPTIONS"])
 @jwt_required()
 def restore_from_trash(file_id):
     user_id = get_jwt_identity()
@@ -166,7 +167,7 @@ def restore_from_trash(file_id):
     return jsonify({"message": "File restored"}), 200
 
 
-@file_bp.delete("/trash/<file_id>/purge")
+@file_bp.route("/trash/<file_id>/purge", methods=["DELETE", "OPTIONS"])
 @jwt_required()
 def purge_file(file_id):
     user_id = get_jwt_identity()
@@ -184,7 +185,7 @@ def purge_file(file_id):
     return jsonify({"message": "File permanently deleted"}), 200
 
 
-@file_bp.post("/trash/purge_older_than_30d")
+@file_bp.route("/trash/purge_older_than_30d", methods=["POST", "OPTIONS"])
 @jwt_required()
 def purge_older_than_30d():
     """Remove all trashed files older than 30 days for this user."""
@@ -212,7 +213,7 @@ def purge_older_than_30d():
 
 
 # ---------- Sharing ----------
-@file_bp.post("/share/<file_id>")
+@file_bp.route("/share/<file_id>", methods=["POST", "OPTIONS"])
 @jwt_required()
 def share_file(file_id):
     user_id = get_jwt_identity()
@@ -233,7 +234,7 @@ def share_file(file_id):
     return jsonify({"message": "Share link generated", "share_link": share_link}), 200
 
 
-@file_bp.get("/public/<share_token>")
+@file_bp.route("/public/<share_token>", methods=["GET", "OPTIONS"])
 def access_shared_file(share_token):
     res = supabase.table("files").select("*").eq("share_token", share_token).execute()
     if not res.data:
@@ -259,7 +260,7 @@ def access_shared_file(share_token):
     }), 200
 
 
-@file_bp.post("/permissions/<file_id>")
+@file_bp.route("/permissions/<file_id>", methods=["POST", "OPTIONS"])
 @jwt_required()
 def update_permissions(file_id):
     user_id = get_jwt_identity()
@@ -276,3 +277,4 @@ def update_permissions(file_id):
     }).eq("id", file_id).execute()
 
     return jsonify({"message": "Permissions updated"}), 200
+
