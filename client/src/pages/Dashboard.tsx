@@ -21,7 +21,7 @@ export const Dashboard: React.FC = () => {
   const loadFiles = async () => {
     try {
       const data = await fileService.getFiles();
-      setFiles(data.filter(file => !file.is_trashed));
+      setFiles(data.filter(file => !file.is_deleted));
     } catch (error) {
       toast.error('Failed to load files');
     } finally {
