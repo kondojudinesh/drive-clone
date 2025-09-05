@@ -6,18 +6,19 @@ export interface FileItem {
   size: number;
   created_at: string;
   updated_at: string;
-  is_trashed: boolean;
+  is_deleted: boolean;  // ✅ match backend schema
+  trashed_at?: string;
 }
 
 export const fileService = {
   async getFiles(): Promise<FileItem[]> {
     const response = await api.get('/files');
-    return response.data;
+    return response.data.files;  // ✅ unwrap files array
   },
 
   async getTrashedFiles(): Promise<FileItem[]> {
     const response = await api.get('/files/trash');
-    return response.data;
+    return response.data.files;  // ✅ unwrap files array
   },
 
   async uploadFile(file: File, onProgress?: (progress: number) => void): Promise<FileItem> {
@@ -36,28 +37,31 @@ export const fileService = {
       },
     });
 
+    return response.data;  // backend returns { message: "..."} but you might want file info later
+  },
+
+  async renameFile(id: string, name: string): Promise<{ message: string }> {
+    const response = await api.post(`/files/file/${id}/rename`, { name });
     return response.data;
   },
 
-  async renameFile(id: string, filename: string): Promise<FileItem> {
-    const response = await api.post(`/files/file/${id}/rename`, { filename });
-    return response.data;
-  },
-
-  async shareFile(id: string): Promise<{ share_url: string }> {
+  async shareFile(id: string): Promise<{ share_link: string }> {
     const response = await api.post(`/files/share/${id}`);
     return response.data;
   },
 
-  async moveToTrash(id: string): Promise<void> {
-    await api.post(`/files/trash/${id}`);
+  async moveToTrash(id: string): Promise<{ message: string }> {
+    const response = await api.post(`/files/trash/${id}`);
+    return response.data;
   },
 
-  async restoreFile(id: string): Promise<void> {
-    await api.post(`/files/trash/${id}/restore`);
+  async restoreFile(id: string): Promise<{ message: string }> {
+    const response = await api.post(`/files/trash/${id}/restore`);
+    return response.data;
   },
 
-  async deleteFilePermanently(id: string): Promise<void> {
-    await api.delete(`/files/trash/${id}/purge`);
+  async deleteFilePermanently(id: string): Promise<{ message: string }> {
+    const response = await api.delete(`/files/trash/${id}/purge`);
+    return response.data;
   }
 };
