@@ -53,10 +53,10 @@ def upload_file():
 
 
 # ---------- List Files ----------
+@file_bp.route("", methods=["GET", "OPTIONS"])
 @file_bp.route("/", methods=["GET", "OPTIONS"])
 @jwt_required()
 def list_files():
-    """List all files for a user (filter trashed if query param is set)."""
     user_id = get_jwt_identity()
     trashed = (request.args.get("trashed", "false").lower() == "true")
 
@@ -124,6 +124,7 @@ def rename_file(file_id):
 
 # ---------- Trash ----------
 @file_bp.route("/trash", methods=["GET", "OPTIONS"])
+@file_bp.route("/trash/", methods=["GET", "OPTIONS"])
 @jwt_required()
 def list_trash():
     user_id = get_jwt_identity()
@@ -188,7 +189,6 @@ def purge_file(file_id):
 @file_bp.route("/trash/purge_older_than_30d", methods=["POST", "OPTIONS"])
 @jwt_required()
 def purge_older_than_30d():
-    """Remove all trashed files older than 30 days for this user."""
     user_id = get_jwt_identity()
     cutoff = datetime.utcnow() - timedelta(days=30)
 
@@ -277,4 +277,5 @@ def update_permissions(file_id):
     }).eq("id", file_id).execute()
 
     return jsonify({"message": "Permissions updated"}), 200
+
 
