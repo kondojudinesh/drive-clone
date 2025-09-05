@@ -21,7 +21,10 @@ def create_app():
         app,
         resources={
             r"/*": {
-                "origins": ["https://driveclonekd.netlify.app"],  # your Netlify frontend
+                "origins": [
+                    "https://driveclonekd.netlify.app",  # Netlify frontend
+                    "http://localhost:5173",            # local dev
+                ],
                 "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
                 "allow_headers": ["Content-Type", "Authorization"],
                 "expose_headers": ["Content-Type", "Authorization"],
@@ -71,5 +74,5 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    # Render uses PORT env var
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
+
