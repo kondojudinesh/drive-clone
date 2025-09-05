@@ -18,7 +18,7 @@ export const Trash: React.FC = () => {
   const loadTrashedFiles = async () => {
     try {
       const data = await fileService.getTrashedFiles();
-      setFiles(data);
+      setFiles(data.filter(file => file.is_deleted));
     } catch (error) {
       toast.error('Failed to load trashed files');
     } finally {
