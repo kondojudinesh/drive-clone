@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 
@@ -23,7 +23,7 @@ def create_app():
             r"/*": {
                 "origins": [
                     "https://driveclonekd.netlify.app",  # Netlify frontend
-                    "http://localhost:5173",            # local dev
+                    "http://localhost:5173",            # Local dev
                 ],
                 "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
                 "allow_headers": ["Content-Type", "Authorization"],
@@ -37,6 +37,14 @@ def create_app():
     # JWT
     # ======================
     JWTManager(app)
+
+    # ======================
+    # Handle OPTIONS globally (preflight)
+    # ======================
+    @app.before_request
+    def handle_options():
+        if request.method == "OPTIONS":
+            return jsonify({"status": "ok"}), 200
 
     # ======================
     # Default Routes
@@ -75,4 +83,5 @@ app = create_app()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
+
 
