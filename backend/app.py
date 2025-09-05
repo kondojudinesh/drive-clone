@@ -13,11 +13,12 @@ def create_app():
 
     # CORS
     CORS(
-        app,
-        resources={r"/*": {"origins": "*"}},
-        supports_credentials=True,
-        expose_headers=["Content-Type", "Authorization"]
+    app,
+    resources={r"/*": {"origins": ["https://driveclonekd.netlify.app"]}},
+    supports_credentials=True,
+    expose_headers=["Content-Type", "Authorization"]
     )
+
 
     # JWT
     JWTManager(app)
